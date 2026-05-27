@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # Judgement - Card Game Scorer
-# Launches the scorer in your default browser
+# Starts a local server and launches the game in your default browser
+# Usage: ./run.sh [--fresh]
+#   --fresh  Clear all saved player history and start clean
 
 set -e
 
-# Resolve the directory this script lives in (handles symlinks and spaces)
 SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 GAME_FILE="${SCRIPT_DIR}/index.html"
 
@@ -13,29 +14,56 @@ if [ ! -f "${GAME_FILE}" ]; then
   exit 1
 fi
 
-echo "Launching Judgement scorer..."
-echo "File: ${GAME_FILE}"
+PORT=8765
+QUERY=""
+
+for arg in "$@"; do
+  case "$arg" in
+    --fresh) QUERY="?fresh=1" ;;
+  esac
+done
+
+# Kill server on exit
+cleanup() {
+  if [ -n "$SERVER_PID" ]; then
+    kill "$SERVER_PID" 2>/dev/null
+  fi
+}
+trap cleanup EXIT INT TERM
+
+# Start HTTP server in the background
+python3 -m http.server "$PORT" --directory "$SCRIPT_DIR" &>/dev/null &
+SERVER_PID=$!
+sleep 0.3
+
+URL="http://localhost:${PORT}/index.html${QUERY}"
+
+if [ -n "$QUERY" ]; then
+  echo "Starting fresh — all player history will be cleared."
+fi
+echo "Serving at ${URL}"
+echo "Press Ctrl+C to stop."
 
 # Cross-platform open
 case "$(uname -s)" in
   Darwin)
-    open "${GAME_FILE}"
+    open "$URL"
     ;;
   Linux)
     if command -v xdg-open >/dev/null 2>&1; then
-      xdg-open "${GAME_FILE}"
+      xdg-open "$URL"
     elif command -v gnome-open >/dev/null 2>&1; then
-      gnome-open "${GAME_FILE}"
+      gnome-open "$URL"
     else
-      echo "Could not find xdg-open. Open this file manually in your browser:"
-      echo "  ${GAME_FILE}"
+      echo "Open this URL in your browser: ${URL}"
     fi
     ;;
   CYGWIN*|MINGW*|MSYS*)
-    start "" "${GAME_FILE}"
+    start "" "$URL"
     ;;
   *)
-    echo "Unrecognized OS. Open this file manually in your browser:"
-    echo "  ${GAME_FILE}"
+    echo "Open this URL in your browser: ${URL}"
     ;;
 esac
+
+wait "$SERVER_PID"
