@@ -209,6 +209,51 @@
   .mode-btn.active .mode-detail {
     color: var(--accent-2);
   }
+  .option-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .option-toggle:hover {
+    background: rgba(15, 23, 42, 0.6);
+  }
+  .option-toggle input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--accent-2);
+    cursor: pointer;
+  }
+  .option-toggle .toggle-text {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .option-toggle .toggle-detail {
+    font-size: 11px;
+    color: var(--muted);
+    margin-left: auto;
+  }
+  .trump-card.no-trump {
+    background: linear-gradient(135deg, #334155, #1e293b) !important;
+    border-color: rgba(148, 163, 184, 0.3) !important;
+  }
+  .trump-card.no-trump .center-suit {
+    font-size: 36px !important;
+    opacity: 0.7;
+  }
+  .round-hero.trump-NoTrump {
+    --trump-glow: radial-gradient(500px circle at 30% 50%, rgba(148, 163, 184, 0.12), transparent 70%);
+  }
+  .trump-name-big.no-trump {
+    color: var(--muted) !important;
+  }
 
   /* === Player Stats === */
   .player-stats-wrap {
@@ -793,6 +838,66 @@
   .trump-Clubs    { --trump-glow: rgba(148, 163, 184, 0.25); }
   .trump-Hearts   { --trump-glow: rgba(248, 113, 113, 0.4); }
 
+  /* How to Play */
+  .how-to-play {
+    margin-bottom: 14px;
+  }
+  .htp-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(56, 189, 248, 0.08);
+    border: 1px solid rgba(56, 189, 248, 0.15);
+    border-radius: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: background 0.15s;
+    width: 100%;
+    text-align: left;
+    color: var(--accent-2);
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .htp-toggle:hover { background: rgba(56, 189, 248, 0.14); }
+  .htp-toggle .arrow { transition: transform 0.2s; font-size: 10px; }
+  .htp-toggle.open .arrow { transform: rotate(90deg); }
+  .htp-body {
+    display: none;
+    margin-top: 10px;
+    padding: 14px 16px;
+    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text);
+  }
+  .htp-body.open { display: block; }
+  .htp-body h3 {
+    font-size: 13px;
+    color: var(--accent);
+    margin: 0 0 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .htp-body h3:not(:first-child) { margin-top: 14px; }
+  .htp-body ul {
+    margin: 0 0 4px;
+    padding-left: 18px;
+  }
+  .htp-body li { margin-bottom: 3px; }
+  .htp-body .mode-tag {
+    display: inline-block;
+    padding: 1px 7px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    vertical-align: middle;
+  }
+  .htp-body .tag-normal { background: rgba(56, 189, 248, 0.15); color: var(--accent-2); }
+  .htp-body .tag-extended { background: rgba(167, 139, 250, 0.15); color: var(--accent-3); }
+  .htp-body .tag-nt { background: rgba(148, 163, 184, 0.15); color: var(--muted); }
+
   /* Fade-in */
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(8px); }
@@ -833,6 +938,43 @@
       <div class="mode-toggle">
         <button type="button" class="mode-btn active" id="modeNormal" onclick="selectMode('normal')">Normal<span class="mode-detail">13 rounds · 13→1 cards</span></button>
         <button type="button" class="mode-btn" id="modeExtended" onclick="selectMode('extended')">Extended<span class="mode-detail">26 rounds · 13→1→13 cards</span></button>
+      </div>
+      <label class="option-toggle">
+        <input type="checkbox" id="noTrumpToggle" onchange="updateNoTrumpToggle()" />
+        <span class="toggle-text">No Trump rounds</span>
+        <span class="toggle-detail">Every 5th round has no trump suit</span>
+      </label>
+    </div>
+    <div class="how-to-play">
+      <button type="button" class="htp-toggle" onclick="this.classList.toggle('open'); this.nextElementSibling.classList.toggle('open');">
+        <span class="arrow">▶</span> How to Play
+      </button>
+      <div class="htp-body">
+        <h3>Basics</h3>
+        <ul>
+          <li>4 players are dealt cards each round. Before playing, each player <strong>bids</strong> how many tricks they think they'll win.</li>
+          <li><strong>Scoring:</strong> match your bid exactly → <strong>bid + 10</strong> points. Miss → <strong>0</strong> points.</li>
+          <li>The trump suit beats all other suits. It rotates each round: ♠ → ♦ → ♣ → ♥ → ♠ …</li>
+          <li>Highest total score after all rounds wins.</li>
+        </ul>
+        <h3>Game Modes</h3>
+        <ul>
+          <li><span class="mode-tag tag-normal">Normal</span> — <strong>13 rounds.</strong> Cards per player go <strong>13 → 1</strong> (descending).</li>
+          <li><span class="mode-tag tag-extended">Extended</span> — <strong>26 rounds.</strong> Cards go <strong>13 → 1 → 13</strong> (V-shaped: descend then ascend).</li>
+        </ul>
+        <h3>No Trump Option <span class="mode-tag tag-nt">Optional</span></h3>
+        <ul>
+          <li>When enabled, every <strong>5th round</strong> (rounds 5, 10, 15 …) is played with <strong>no trump suit</strong>.</li>
+          <li>In a No Trump round, there is no trump — only the led suit matters.</li>
+          <li>The trump rotation <strong>pauses</strong> during No Trump rounds and resumes from where it left off.</li>
+        </ul>
+        <h3>Using This Scorer</h3>
+        <ul>
+          <li>Enter player names and choose your mode.</li>
+          <li>Each round: enter bids → mark each player as ✓ made or ✗ missed → Submit.</li>
+          <li>Use <strong>Undo</strong> if you make a mistake.</li>
+          <li>Player win/loss stats are saved across games automatically.</li>
+        </ul>
       </div>
     </div>
     <div class="actions">
@@ -891,6 +1033,7 @@
     { name: 'Clubs',    symbol: '♣', color: 'black' },
     { name: 'Hearts',   symbol: '♥', color: 'red'   },
   ];
+  const NO_TRUMP = { name: 'No Trump', symbol: '⊘', color: 'none' };
   const NORMAL_ROUNDS = 13;
   const EXTENDED_ROUNDS = 26;
   const STARTING_CARDS = 13;
@@ -904,24 +1047,40 @@
   ];
 
   let selectedMode = 'normal';
+  let selectedNoTrump = false;
 
   let state = {
     players: [],
     rounds: [],
     mode: 'normal',
     totalRounds: NORMAL_ROUNDS,
+    noTrump: false,
     recorded: false,
   };
 
-  const STATS_KEY = 'judgement-player-stats';
+  let _statsCache = {};
 
   function loadStats() {
-    try { return JSON.parse(localStorage.getItem(STATS_KEY)) || {}; }
-    catch { return {}; }
+    return _statsCache;
   }
 
   function saveStats(stats) {
-    localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+    _statsCache = stats;
+    fetch('/api/stats', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(stats),
+    }).catch(() => {});
+  }
+
+  async function initStats() {
+    try {
+      const res = await fetch('/api/stats');
+      _statsCache = await res.json();
+    } catch {
+      _statsCache = {};
+    }
+    renderPlayerStats();
   }
 
   function ensurePlayerStats(stats, name) {
@@ -1003,12 +1162,31 @@
     selectedMode = mode;
     document.getElementById('modeNormal').classList.toggle('active', mode === 'normal');
     document.getElementById('modeExtended').classList.toggle('active', mode === 'extended');
-    const rounds = mode === 'extended' ? EXTENDED_ROUNDS : NORMAL_ROUNDS;
+    updateSubtitle();
+  }
+
+  function updateNoTrumpToggle() {
+    selectedNoTrump = document.getElementById('noTrumpToggle').checked;
+    updateSubtitle();
+  }
+
+  function updateSubtitle() {
+    const rounds = selectedMode === 'extended' ? EXTENDED_ROUNDS : NORMAL_ROUNDS;
+    const ntNote = selectedNoTrump ? ' · No trump every 5th round' : '';
     document.getElementById('subtitle').textContent =
-      `${rounds} rounds · Trump rotates each round · Bid before you play · Match your bid exactly or score zero`;
+      `${rounds} rounds · Trump rotates each round${ntNote} · Bid before you play · Match your bid exactly or score zero`;
+  }
+
+  function isNoTrumpRound(roundIndex) {
+    return state.noTrump && (roundIndex + 1) % 5 === 0;
   }
 
   function trumpForRound(roundIndex) {
+    if (isNoTrumpRound(roundIndex)) return NO_TRUMP;
+    if (state.noTrump) {
+      const ntBefore = Math.floor(roundIndex / 5);
+      return SUITS[(roundIndex - ntBefore) % SUITS.length];
+    }
     return SUITS[roundIndex % SUITS.length];
   }
 
@@ -1028,6 +1206,7 @@
     state.rounds = [];
     state.mode = selectedMode;
     state.totalRounds = selectedMode === 'extended' ? EXTENDED_ROUNDS : NORMAL_ROUNDS;
+    state.noTrump = selectedNoTrump;
     document.getElementById('setupPanel').classList.add('hidden');
     render();
   }
@@ -1100,23 +1279,24 @@
       ? (roundIdx < NORMAL_ROUNDS ? '▼ Descending' : '▲ Ascending')
       : '';
 
-    hero.className = `round-hero trump-${trump.name}`;
+    const isNT = trump === NO_TRUMP;
+    hero.className = `round-hero trump-${trump.name.replace(/\s/g, '')}`;
     hero.innerHTML = `
-      <div class="trump-card ${trump.color}" aria-label="Ace of ${trump.name}">
+      <div class="trump-card ${isNT ? 'no-trump' : trump.color}" aria-label="${isNT ? 'No Trump' : 'Ace of ' + trump.name}">
         <span class="corner tl">
-          <span class="rank-letter">A</span>
-          <span class="corner-suit">${trump.symbol}</span>
+          <span class="rank-letter">${isNT ? 'NT' : 'A'}</span>
+          <span class="corner-suit">${isNT ? '' : trump.symbol}</span>
         </span>
         <span class="center-suit">${trump.symbol}</span>
         <span class="corner br">
-          <span class="rank-letter">A</span>
-          <span class="corner-suit">${trump.symbol}</span>
+          <span class="rank-letter">${isNT ? 'NT' : 'A'}</span>
+          <span class="corner-suit">${isNT ? '' : trump.symbol}</span>
         </span>
       </div>
       <div class="round-hero-info">
         <div class="round-label">Round</div>
         <div class="round-number">${roundIdx + 1} <span style="font-size:20px; color: var(--muted); font-weight: 500;">of ${state.totalRounds}</span></div>
-        <div class="trump-name-big ${trump.color}">Trump: ${trump.name} ${trump.symbol}</div>
+        <div class="trump-name-big ${isNT ? 'no-trump' : trump.color}">${isNT ? 'No Trump' : 'Trump: ' + trump.name + ' ' + trump.symbol}</div>
         <div class="meta-chips">
           <span class="chip">🎴 <strong>${cards}</strong> cards per player</span>
           <span class="chip">🎯 <strong>${cards}</strong> tricks up for grabs</span>
@@ -1283,8 +1463,10 @@
 
   function resetGame() {
     if (!confirm('Reset the entire game? All scores will be cleared.')) return;
-    state = { players: [], rounds: [], mode: 'normal', totalRounds: NORMAL_ROUNDS, recorded: false };
+    state = { players: [], rounds: [], mode: 'normal', totalRounds: NORMAL_ROUNDS, noTrump: false, recorded: false };
     selectedMode = 'normal';
+    selectedNoTrump = false;
+    document.getElementById('noTrumpToggle').checked = false;
     selectMode('normal');
     document.getElementById('setupPanel').classList.remove('hidden');
     renderPlayerStats();
@@ -1323,7 +1505,7 @@
 
       html += `<tr>
         <td><strong>${r.roundNum}</strong></td>
-        <td><span class="round-trump-cell"><span class="suit-sym ${r.trump.color}">${r.trump.symbol}</span> ${r.trump.name}</span></td>
+        <td><span class="round-trump-cell">${r.trump === NO_TRUMP || r.trump.name === 'No Trump' ? '<span style="color:var(--muted)">⊘ No Trump</span>' : `<span class="suit-sym ${r.trump.color}">${r.trump.symbol}</span> ${r.trump.name}`}</span></td>
         <td>${r.cards}</td>`;
       r.entries.forEach((e, i) => {
         const cls = e.score > 0 ? 'pos' : 'zero';
@@ -1400,11 +1582,11 @@
   });
 
   if (new URLSearchParams(window.location.search).has('fresh')) {
-    localStorage.removeItem(STATS_KEY);
+    saveStats({});
     window.history.replaceState({}, '', window.location.pathname);
   }
 
-  renderPlayerStats();
+  initStats();
 </script>
 </body>
 </html>

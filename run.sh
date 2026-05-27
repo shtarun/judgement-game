@@ -32,7 +32,7 @@ cleanup() {
 trap cleanup EXIT INT TERM
 
 # Start HTTP server in the background
-python3 -m http.server "$PORT" --directory "$SCRIPT_DIR" &>/dev/null &
+python3 "${SCRIPT_DIR}/server.py" "$PORT" &>/dev/null &
 SERVER_PID=$!
 sleep 0.3
 
